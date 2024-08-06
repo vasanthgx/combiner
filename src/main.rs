@@ -1,11 +1,11 @@
 mod args;
 use args::Args;
-use image::{io::Reader, DynamicImage, ImageFormat, imageops::Triangle};
+use image::{io::Reader, DynamicImage, ImageFormat,GenericImageView, imageops::FilterType::Triangle};
 
 
 
 
-fn main() -> Result<(), ImageDataErrors {
+fn main() -> Result<(), ImageDataErrors> {
     let args = Args::new();
     println!("{:?}", args);
 
@@ -17,7 +17,7 @@ fn main() -> Result<(), ImageDataErrors {
     }
     // ok(());
 
-    let (image_1, image_2) = standardize_size(image_1, image_2)
+    let (image_1, image_2) = standardize_size(image_1, image_2);
 
     let mut output = FloatingImage::new(image_1.width(), image_1.height(), args.output);
 
@@ -31,23 +31,24 @@ fn main() -> Result<(), ImageDataErrors {
         output.width,
         output.height,
         image::ColorType::Rgb8,
-        image::ImageFormat,
+        image_1_format,
     ).unwrap();
-    ok(())
+    Ok(())
 }
 
 //creating a function named find_image_from_path to open the image file from a path argument
 
-fn find_image_from_path(path: String) ->(DynamicImage, ImageFormat){
-    let image_reader: Reader<BufReader<File>> = Reader::open(path).unwrap();
-    let image_format: ImageFormat = image_reader.format().unwrap();
-    let image: DynamicImage = image_reader.decode().unwrap();
-    (image, image_format)
+fn find_image_from_path(path: String) -> (DynamicImage, ImageFormat) {
+  let image_reader = Reader::open(path).unwrap();
+  let image_format = image_reader.format().unwrap();
+  let image = image_reader.decode().unwrap();
+  (image, image_format)
 }
 // The image and image_format variables are returned as a tuple
 
 
 // enum definition for error messages
+#[derive(Debug)]
 enum ImageDataErrors {
     DifferentImageFormats,
     BufferTooSmall,
@@ -60,7 +61,7 @@ fn get_smallest_dimensions(dim_1:(u32, u32), dim_2:(u32, u32))->(u32, u32){
 
     let pix_1 = dim_1.0 * dim_1.1; // tupele values are accessed using dot notation from  zero base indexing
     let pix_2 = dim_2.0 * dim_2.1;
-    if pix_1 < pix2 {dim_1} else {dim_2};
+    if pix_1 < pix_2 {dim_1} else {dim_2}
 }
 
 // standardizing the larger image to match the smaller image
@@ -71,10 +72,10 @@ fn standardize_size(image_1: DynamicImage, image_2: DynamicImage)->(DynamicImage
 
     println!("width: {}, height: {}\n", width, height);
 
-    if(image_2.dimensions() == (width, height)){
-        (image_1.resize_exact(image_2, width, height), Triangle)
+    if image_2.dimensions() == (width, height){
+        (image_1.resize_exact( width, height,Triangle), image_2)
     }else{
-        (image_2.resize_exact(image_1, width, height), Triangle)
+        (image_2.resize_exact( width, height, Triangle), image_1)
     }
 }
 // the resize_exact() method is used to resize the image by implementing on the DynamicImage struct 
@@ -142,7 +143,7 @@ fn combine_images ( image_1: DynamicImage, image_2:DynamicImage) -> Vec<u8>{
 fn alternate_pixels(vec_1: Vec<u8>, vec_2: Vec<u8> )-> Vec<u8>{
 
     // A variable called combined data is created. Which is a Vec<u8> with the same length of vec_1
-    let mut combined_data = vec![0u8, vec_1.len()];
+    let mut combined_data = vec![0u8; vec_1.len()];
 
     let mut i = 0;
     while i < vec_1.len(){
