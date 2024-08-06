@@ -9,6 +9,7 @@ fn get_nth_arg(n: usize)->String{
 //type String: image_1, image_2 and output
 // so that we can access them outside of the args.rs file
 
+#[derive(Debug)]
 pub struct Args{
     pub image_1: String,
     pub image_2: String,
@@ -28,3 +29,4 @@ impl Args{
         }
     }
 }
+
