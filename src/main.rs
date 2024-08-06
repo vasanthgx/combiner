@@ -100,3 +100,55 @@ impl FloatingImage{
 //using the image_1 variable's width and height values and the name of the output image
 //from the third argument strored in args.
 
+
+////////////////////////////Creating the Combined Image Data//////////////////////
+
+//we need to first process the images to a vector of RGBA pixels as u8s type 
+//and then combine them using the alternate_pixels() function    
+
+fn combine_images ( image_1: DynamicImage, image_2:DynamicImage) -> Vec<u8>{
+    let vec_1 = image_1.to_rgb8().into_vec();
+    let vec_2 = image_2.to_rgb8().into_vec();
+
+    alternate_pixels(vec_1,vec_2)
+}
+
+
+// this function alternates between vec_1 and vec_2, and copies 4 bytes from vec_1 to combined_data - if the index
+// is  a multiple of 8, otherwise it copies 4 bytes from vec_2 to combined_data.
+fn alternate_pixels(vec_1: Vec<u8>, vec_2: Vec<u8> )-> Vec<u8>{
+
+    // A variable called combined data is created. Which is a Vec<u8> with the same length of vec_1
+    let mut combined_data = vec![0u8, vec_1.len()];
+
+    let mut i = 0;
+    while i < vec_1.len(){
+        if i % 8 == 0{
+            combined_data.splice(i..=i + 3, set_rgba(&vec_1, i, i + 3));
+        } else {
+            combined_data.splice(i..= i+3, set_rgba(&vec_2, i, i + 3));
+        }
+
+        i += 4;
+    }
+
+    combined_data
+
+}
+
+/////////////////The set_rgba function is a helper function which extracts a slice of 4 bytes(representing
+//RGBA values) from a given vector.////////////////////////////////
+
+fn set_rgba(vec: &Vec<u8>, start: usize, end:usize) -> Vec<u8>{
+    let mut rgba = Vec::new();
+    for i in start..=end{
+        let  val = match vec.get(i){
+            Some(d) => *d,
+            None => panic!("Index out of bounds")
+
+        };
+        rgba.push(val);
+    }
+    rgba
+
+}
