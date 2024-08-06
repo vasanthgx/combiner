@@ -18,6 +18,8 @@ fn main() -> Result<(), ImageDataErrors {
     // ok(());
 
     let (image_1, image_2) = standardize_size(image_1, image_2)
+
+    let mut output = FloatingImage::new(image_1.width(), image_1.height(), args.output);
     ok(())
 }
 
@@ -63,3 +65,38 @@ fn standardize_size(image_1: DynamicImage, image_2: DynamicImage)->(DynamicImage
 }
 // the resize_exact() method is used to resize the image by implementing on the DynamicImage struct 
 //by mutably borrowing the image_1 and image_2 variables - width, height and FilterType.
+
+
+//////////////////Creating a Floating Image////////////////////////////
+
+
+// Defining a struct named FloatingImage - temporary struct to hold the metadata of the output image
+
+struct FloatingImage{
+    width: u32,
+    height: u32,
+    data: Vec<u8>,
+    name: String,
+}
+
+// To implement the FloatingImage struct we need to implement a new () function
+
+impl FloatingImage{
+
+    fn new(width:u32, height: u32, name: String)-> Self{
+        let buffer_capacity = 3_655_744;
+        let buffer: Vec<u8> = Vec::with_capacity(buffer_capacity);
+        FloatingImage{
+            width,
+            height,
+            data: buffer,
+            name
+        }
+    }
+}
+
+
+// creating an instance of the FloatingImage struct in the main function.
+//using the image_1 variable's width and height values and the name of the output image
+//from the third argument strored in args.
+
