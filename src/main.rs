@@ -24,6 +24,15 @@ fn main() -> Result<(), ImageDataErrors {
     let combined_data = combine_images(image_1, image_2);
 
     output.set_data(combined_data)?;
+
+    image::save_buffer_with_format(
+        output.name,
+        &output.data,
+        output.width,
+        output.height,
+        image::ColorType::Rgb8,
+        image::ImageFormat,
+    ).unwrap();
     ok(())
 }
 
@@ -171,9 +180,26 @@ fn set_rgba(vec: &Vec<u8>, start: usize, end:usize) -> Vec<u8>{
 ///////////////////////////Attaching the Combined Data to the Floating////////////////////////////////
 
 
-//To set the data of combined_data into the output image, a method on FloatingImage struct  is defined to set the 
+//To set the data of combined_data into the output image, a method "set_data" on FloatingImage struct  is defined to set the 
 //data field of output to the value of combined_data.
 
+//the enum ImageDataErrors needs to be extended to support the new unit variant 'BufferTooSmall'
+
+///// next we use the set_data method to set the data field of the output image//// output.set_data(combined_data)?;
+
+// The ? syntax at the end of an expression is a shorthand way of handling the result of a function call. If the function call returns an error, the error propagation operator will return the error from the function call.
 
 
-///////////////
+/////////////// Wrtiting the image to a File////////////////////
+
+// the image crate has a method called save_buffer_with_format which saves the image to a file and 
+//takes the following format:
+
+// fn save_buffer_with_format(
+//     path: AsRef<Path>,
+//     buf: &[u8],
+//     width: u32,
+//     height:u32,
+//     color:image::ColorType,
+//     format:image::ImageFormat,
+// ) -> image::ImageResult<()>;
