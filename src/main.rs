@@ -20,6 +20,10 @@ fn main() -> Result<(), ImageDataErrors {
     let (image_1, image_2) = standardize_size(image_1, image_2)
 
     let mut output = FloatingImage::new(image_1.width(), image_1.height(), args.output);
+
+    let combined_data = combine_images(image_1, image_2);
+
+    output.set_data(combined_data)?;
     ok(())
 }
 
@@ -37,6 +41,7 @@ fn find_image_from_path(path: String) ->(DynamicImage, ImageFormat){
 // enum definition for error messages
 enum ImageDataErrors {
     DifferentImageFormats,
+    BufferTooSmall,
 }
 
 
@@ -93,6 +98,15 @@ impl FloatingImage{
             name
         }
     }
+fn set_data(&mut self, data: Vec<u8>) -> Result<(), ImageDataErrors> {
+    // If the previously assigned buffer is too small to hold the new data
+    if data.len() > self.data.capacity() {
+      return Err(ImageDataErrors::BufferTooSmall);
+    }
+    self.data = data;
+    Ok(())
+  }
+
 }
 
 
@@ -152,3 +166,14 @@ fn set_rgba(vec: &Vec<u8>, start: usize, end:usize) -> Vec<u8>{
     rgba
 
 }
+
+
+///////////////////////////Attaching the Combined Data to the Floating////////////////////////////////
+
+
+//To set the data of combined_data into the output image, a method on FloatingImage struct  is defined to set the 
+//data field of output to the value of combined_data.
+
+
+
+///////////////
